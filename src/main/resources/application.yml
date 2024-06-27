@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: gateway
+
+  security:
+    user:
+      name: ${ACTUATOR_USER}
+      password: ${ACTUATOR_PASSWORD}
+
+  cloud:
+    gateway:
+      routes:
+      #Bank core system
+      - id: bank-service-demo
+        uri: lb://bank-service
+        predicates:
+          - Path=/bank-service/**
+
+      #Web message
+      - id: message-service
+        uri: lb://message-service
+        predicates:
+          - Path=/message-service/**
+server:
+  port: ${APP_PORT}
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: ${EUREKA_SERVER}
+
+slack:
+  webportfolio:
+    channel-id: ${SLACK_PORTFOLIO_CHANNEL}
+    bot-token: ${SLACK_PORTFOLIO_TOKEN}
+
+logging:
+  level:
+    root: INFO
