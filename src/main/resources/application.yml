@@ -1,6 +1,8 @@
 spring:
   application:
     name: gateway
+  main:
+    allow-bean-definition-overriding: true
 
   security:
     user:
@@ -38,6 +40,19 @@ slack:
     channel-id: ${SLACK_PORTFOLIO_CHANNEL}
     bot-token: ${SLACK_PORTFOLIO_TOKEN}
 
+
 logging:
   level:
     root: INFO
+    org:
+      springframework:
+        aop: DEBUG
+redis:
+  webportfolio:
+    port: 6379
+    server: localhost
+    max-request: 5
+    reset-time: 1 #In minute
+  bank:
+    max-request: 50
+    reset-time: 1
