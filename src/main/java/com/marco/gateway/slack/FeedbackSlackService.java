@@ -1,6 +1,7 @@
 package com.marco.gateway.slack;
 
 import com.marco.gateway.config.SlackConfig;
+import com.marco.gateway.util.DateTimeUtil;
 import com.slack.api.Slack;
 import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
@@ -62,10 +63,12 @@ public class FeedbackSlackService implements ISlackService {
                              @NonNull String content) {
 
         List<LayoutBlock> blocks = formSlackMessage(title, subtitle, content);
+        String text = title + " : " + subtitle + " : " + content;
 
         return ChatPostMessageRequest.builder()
                 .channel(channel)
                 .blocks(blocks)
+                .text(text)
                 .build();
     }
 
@@ -86,7 +89,7 @@ public class FeedbackSlackService implements ISlackService {
         try {
             ChatPostMessageResponse response = slack.methods(slackConfig.getBotToken()).chatPostMessage(request);
             if(response.isOk()) {
-                logger.info("Message successfully sent to channel {} at timestamp {}", channel, response.getTs());
+                logger.info("Message successfully sent to channel {} at timestamp {}", channel, DateTimeUtil.getCurrentDateTimeFormatted());
                 return true;
             } else {
                 logger.warn("Failed to send message to channel {} due to error: {}", channel, response.getError());
