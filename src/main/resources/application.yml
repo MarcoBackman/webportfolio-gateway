@@ -52,7 +52,7 @@ redis:
     port: 6379
     server: localhost
     max-request: 5
-    reset-time: 1 #In minute
+    reset-time: 2 #In minute
   bank:
     max-request: 50
-    reset-time: 1
+    reset-time: 2

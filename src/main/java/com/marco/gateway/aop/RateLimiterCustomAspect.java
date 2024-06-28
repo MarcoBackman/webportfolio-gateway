@@ -51,7 +51,7 @@ public class RateLimiterCustomAspect extends AbstractRateLimit<String, String> {
                 key,
                 redisProperties.getMaxRequest(),
                 redisProperties.getResetTime());
-        if (expirationTime == -1) {
+        if (expirationTime != -1) {
             return ResponseEntity
                     .status(HttpStatus.TOO_MANY_REQUESTS)
                     .body("Too many request. Please try again after " + expirationTime + " minutes");
@@ -75,7 +75,7 @@ public class RateLimiterCustomAspect extends AbstractRateLimit<String, String> {
                     key,
                     redisBankProperties.getMaxRequest(),
                     redisBankProperties.getResetTime());
-            if (expirationTime == -1) {
+            if (expirationTime != -1) {
                 return ResponseEntity
                         .status(HttpStatus.TOO_MANY_REQUESTS)
                         .body("Too many request. Please try again after " + expirationTime + " minutes");

@@ -57,12 +57,12 @@ public class AbstractRateLimit<K, V> {
 
         if (valueInt > maxRequest) {
             logger.debug("Request reached a limit key={}, valueInt={}", key, valueInt);
-            return (long) -1;
+            return expire;
         } else {
             logger.debug("Incrementing request count. key={}", key);
             redisTemplate.opsForValue().increment(key);
             redisTemplate.expire(key, resetTime, TimeUnit.MINUTES);
         }
-        return expire;
+        return (long) -1;
     }
 }
