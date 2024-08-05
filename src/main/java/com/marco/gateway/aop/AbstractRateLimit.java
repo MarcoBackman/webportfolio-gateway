@@ -11,7 +11,7 @@ public class AbstractRateLimit<K, V> {
 
     private final Logger logger;
     private final RedisTemplate<K, V> redisTemplate;
-    private final V resetValue;
+    private final V resetValue; //For initialization value
     AbstractRateLimit(Logger parentLogger,
                       RedisTemplate<K, V> redisTemplate,
                       V resetValue) {
@@ -28,7 +28,7 @@ public class AbstractRateLimit<K, V> {
         } else if (value instanceof Integer) {
             return (Integer) value;
         } else if (value instanceof Long) {
-            return (int) value;
+            return ((Long)value).intValue();
         } else if (value instanceof Character) {
             return Character.getNumericValue((Character) value);
         }
@@ -39,30 +39,38 @@ public class AbstractRateLimit<K, V> {
      * @param key key value for redis template - unique id
      * @param maxRequest number of max request during the given time
      * @param resetTime reset time
-     * @return ture - on valid request, false - invalid request
+     * @return Long - returns the remaining reset time. -1 to represent no waiting time for the next request
      */
     protected Long processRateLimit(K key,
                                       Integer maxRequest,
                                       Integer resetTime) {
+        //value - value of the requestedAmt .expire - reset time
         V value = redisTemplate.opsForValue().get(key);
         Long expire = redisTemplate.getExpire(key, TimeUnit.MINUTES);
 
+        //Initial call - valid request
         if (value == null || expire == null || expire == -1) {
             logger.debug("No expiration time found. Resetting to 0. key={}", key);
             redisTemplate.opsForValue().set(key, resetValue);
-            value = resetValue;
+            redisTemplate.opsForValue().increment(key);
+            return (long) -1;
         }
 
         Integer valueInt = castVToInt(value);
 
-        if (valueInt > maxRequest) {
+        //Check reset time
+        if (expire <= 0) { //expiration reached the reset cycle
+            redisTemplate.expire(key, resetTime, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set(key, resetValue);
+            redisTemplate.opsForValue().increment(key);
+            return (long) -1;
+        } else if (valueInt > maxRequest) { //Exceeded request Amt return remaining time
             logger.debug("Request reached a limit key={}, valueInt={}", key, valueInt);
             return expire;
-        } else {
+        } else { //Valid request - no waiting time -> -1
             logger.debug("Incrementing request count. key={}", key);
             redisTemplate.opsForValue().increment(key);
-            redisTemplate.expire(key, resetTime, TimeUnit.MINUTES);
+            return (long) -1;
         }
-        return (long) -1;
     }
 }

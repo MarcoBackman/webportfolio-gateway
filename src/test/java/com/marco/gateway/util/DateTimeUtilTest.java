@@ -21,7 +21,6 @@ public class DateTimeUtilTest {
             mockedStatic.when(IDateTime::getCurrentDateTime).thenReturn(testDateTime);
 
             String actualDateTime = DateTimeUtil.getCurrentDateTimeFormatted();
-            System.out.println(actualDateTime);
             assertThat(actualDateTime).isEqualTo("2024-06-27 11:25:12");
         }
     }

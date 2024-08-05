@@ -8,21 +8,19 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 @Getter
-@EnableAspectJAutoProxy
 @Configuration
 public class RedisConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SlackConfig.class);
 
-    private String server;
-    private Integer port;
+    private final String server;
+    private final Integer port;
 
     public RedisConfig(RedisProperties redisProperties) {
         this.server = redisProperties.getServer();

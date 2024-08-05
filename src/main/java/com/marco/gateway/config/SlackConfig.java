@@ -11,12 +11,14 @@ public class SlackConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SlackConfig.class);
 
-    private String botToken;
-    private String channelId;
+    private final String botToken;
+    private final String channelId;
+    private final String channelName;
 
     public SlackConfig(SlackProperties slackProperties) {
         this.botToken = slackProperties.getBotToken();
         this.channelId = slackProperties.getChannelId();
+        this.channelName = slackProperties.getChannelName();
         logger.info("Slack config init. Loaded token: {}, channelId: {}",
                 botToken.substring(0, 5), channelId.substring(0, 5));
     }

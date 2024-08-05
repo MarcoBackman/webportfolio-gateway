@@ -1,5 +1,6 @@
 package com.marco.gateway.controller;
 
+import com.marco.gateway.config.SlackConfig;
 import com.marco.gateway.domain.PortfolioFeedback;
 import com.marco.gateway.slack.FeedbackSlackService;
 import com.marco.gateway.util.DateTimeUtil;
@@ -15,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class FeedbackController {
 
     private final FeedbackSlackService feedbackSlackService;
+    private final SlackConfig slackConfig;
 
-    private final String FEEDBACK_CHANNEL = "web-portfolio-messages";
-
-    public FeedbackController(FeedbackSlackService feedbackSlackService) {
+    public FeedbackController(FeedbackSlackService feedbackSlackService, SlackConfig slackConfig) {
         this.feedbackSlackService = feedbackSlackService;
+        this.slackConfig = slackConfig;
     }
 
     @PostMapping("/sendFeedbackMessage")
@@ -32,7 +33,7 @@ public class FeedbackController {
                 message.getEmail(),
                 message.getContent());
 
-        boolean isMsgSent = feedbackSlackService.sendSlackMessageToServer(FEEDBACK_CHANNEL, title, subTitle, content);
+        boolean isMsgSent = feedbackSlackService.sendSlackMessageToServer(slackConfig.getChannelName(), title, subTitle, content);
         if (isMsgSent) {
             return new ResponseEntity<>("Message sent", HttpStatus.OK);
         } else {

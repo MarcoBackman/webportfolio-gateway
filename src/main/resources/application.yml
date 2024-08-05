@@ -3,7 +3,8 @@ spring:
     name: gateway
   main:
     allow-bean-definition-overriding: true
-
+  server:
+    port: 9090
   security:
     user:
       name: ${ACTUATOR_USER}
@@ -37,7 +38,8 @@ eureka:
 
 slack:
   webportfolio:
-    channel-id: ${SLACK_PORTFOLIO_CHANNEL}
+    channel-name: ${SLACK_CHANNEL_NAME}
+    channel-id: ${SLACK_PORTFOLIO_CHANNEL_ID}
     bot-token: ${SLACK_PORTFOLIO_TOKEN}
 
 
@@ -49,7 +51,7 @@ logging:
         aop: DEBUG
 redis:
   webportfolio:
-    port: 6379
+    port: ${REDIS_PORT}
     server: localhost
     max-request: 5
     reset-time: 2 #In minute

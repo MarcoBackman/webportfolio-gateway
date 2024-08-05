@@ -12,4 +12,5 @@ import org.springframework.stereotype.Component;
 public class SlackProperties {
     private String botToken;
     private String channelId;
+    private String channelName;
 }

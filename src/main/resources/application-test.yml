@@ -22,7 +22,7 @@ spring:
         predicates:
           - Path=/message-service/**
 server:
-  port: 1000
+  port: 9000
 
 eureka:
   instance:
@@ -35,9 +35,22 @@ eureka:
 
 slack:
   webportfolio:
+    channel-name: slack_channel_name
     channel-id: test_channel
     bot-token: test_token
 
 logging:
   level:
-    root: INFO
+    root: DEBUG
+    org:
+      springframework:
+        aop: DEBUG
+redis:
+  webportfolio:
+    port: 6969
+    server: localhost
+    max-request: 5
+    reset-time: 2 #In minute
+  bank:
+    max-request: 50
+    reset-time: 2

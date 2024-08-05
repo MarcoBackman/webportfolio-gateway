@@ -1,5 +1,6 @@
 package com.marco.gateway.controller;
 
+import com.marco.gateway.config.SlackConfig;
 import com.marco.gateway.domain.PortfolioFeedback;
 import com.marco.gateway.slack.FeedbackSlackService;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -22,9 +24,15 @@ public class FeedbackControllerTest {
 
     @Mock
     private FeedbackSlackService feedbackSlackService;
+    @Mock
+    private SlackConfig slackConfig;
+
+    private final String TEST_CHANNEL_NAME = "test channel name";
 
     @Test
     void when_feedbackSuccessfullySent_then_statusOk() {
+        doReturn(TEST_CHANNEL_NAME).when(slackConfig).getChannelName();
+
         PortfolioFeedback portfolioFeedback = new PortfolioFeedback("Name", "Email", "Message");
         when(feedbackSlackService.sendSlackMessageToServer(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
 
@@ -36,6 +44,8 @@ public class FeedbackControllerTest {
 
     @Test
     void when_feedbackNotSent_then_statusExpectationFailed() {
+        doReturn(TEST_CHANNEL_NAME).when(slackConfig).getChannelName();
+
         PortfolioFeedback portfolioFeedback = new PortfolioFeedback("Name", "Email", "Message");
         when(feedbackSlackService.sendSlackMessageToServer(anyString(), anyString(), anyString(), anyString())).thenReturn(false);
 

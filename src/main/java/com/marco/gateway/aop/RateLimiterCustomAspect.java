@@ -11,18 +11,16 @@ import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerWebExchange;
-
-import java.net.URI;
 
 @Aspect
 @Component
+@EnableAspectJAutoProxy
 public class RateLimiterCustomAspect extends AbstractRateLimit<String, String> {
     private final static Logger logger = LoggerFactory.getLogger(RateLimiterCustomAspect.class);
     private final RedisProperties redisProperties;
@@ -47,42 +45,36 @@ public class RateLimiterCustomAspect extends AbstractRateLimit<String, String> {
         logger.debug("contact me request found");
         String key = joinPoint.getSignature().toString();
 
-        Long expirationTime = processRateLimit(
+        Long remainingResetTime = processRateLimit(
                 key,
                 redisProperties.getMaxRequest(),
                 redisProperties.getResetTime());
-        if (expirationTime != -1) {
+        if (remainingResetTime > 0) {
             return ResponseEntity
                     .status(HttpStatus.TOO_MANY_REQUESTS)
-                    .body("Too many request. Please try again after " + expirationTime + " minutes");
+                    .body("Too many request. Please try again after " + remainingResetTime + " minutes");
         } else {
             return joinPoint.proceed();
         }
     }
 
     // Router rate limit8
-    @Before("execution(* org.springframework.cloud.gateway.handler.FilteringWebHandler.*(..))")
+    @Before("execution(* com.marco.gateway.controller.EventController.*(..))")
     public Object bankServiceRateLimiter(JoinPoint joinPoint) {
+        logger.info("Routing request to bank-service: {}", joinPoint.toShortString());
+        String key = joinPoint.getSignature().toString();
 
-        ServerWebExchange exchange = (ServerWebExchange) joinPoint.getArgs()[0];
-        URI url = exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR);
-        if(url != null && url.getPath().startsWith("/bank-service")){
-            // access the request object and log important info
-            logger.info("Routing request to bank-service: {}", joinPoint.toShortString());
-            logger.debug("bank request found");
-            String key = joinPoint.getSignature().toString();
-            Long expirationTime = processRateLimit(
-                    key,
-                    redisBankProperties.getMaxRequest(),
-                    redisBankProperties.getResetTime());
-            if (expirationTime != -1) {
-                return ResponseEntity
-                        .status(HttpStatus.TOO_MANY_REQUESTS)
-                        .body("Too many request. Please try again after " + expirationTime + " minutes");
-            }
+        Long remainingResetTime = processRateLimit(
+                key,
+                redisBankProperties.getMaxRequest(),
+                redisBankProperties.getResetTime());
+        if (remainingResetTime > 0) {
+            return ResponseEntity
+                    .status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body("Too many request. Please try again after " + remainingResetTime + " minutes");
         }
         return joinPoint.getTarget();
     }
-
-
 }
+
+
