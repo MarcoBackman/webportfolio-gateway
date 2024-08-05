@@ -11,8 +11,10 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         //Todo: read from environment or local file
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:63342", "https://marcobackman.github.io/web-portfolio")
-                .allowedMethods("GET", "POST")
+                .allowedOrigins("http://localhost:63342",
+                        "http://marcobackman.github.io",
+                        "https://marcobackman.github.io")
+                .allowedMethods("GET", "POST", "OPTIONS")
                 .allowedHeaders("Content-Type")
                 .maxAge(3600);
     }

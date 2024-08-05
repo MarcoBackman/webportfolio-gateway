@@ -24,6 +24,11 @@ spring:
           - Path=/message-service/**
 server:
   port: ${APP_PORT}
+  ssl:
+    key-store: classpath:keystore.p12
+    key-store-type: ${SSL_KEY_TYPE}
+    key-store-password: ${SSL_PASSWORD}
+    key-alias: gateway
 
 eureka:
   instance:
