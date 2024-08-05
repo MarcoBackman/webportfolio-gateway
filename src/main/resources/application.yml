@@ -3,8 +3,6 @@ spring:
     name: gateway
   main:
     allow-bean-definition-overriding: true
-  server:
-    port: 9090
   security:
     user:
       name: ${ACTUATOR_USER}
@@ -52,7 +50,7 @@ logging:
 redis:
   webportfolio:
     port: ${REDIS_PORT}
-    server: localhost
+    server: ${REDIS_SERVER}
     max-request: 5
     reset-time: 2 #In minute
   bank:
